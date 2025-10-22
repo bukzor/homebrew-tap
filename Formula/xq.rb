@@ -1,22 +1,12 @@
 class Xq < Formula
-  desc "Command-line XML and HTML beautifier and content extractor"
-  homepage "https://github.com/sibprogrammer/xq"
-  url "https://github.com/sibprogrammer/xq.git",
-      tag:      "v1.2.1",
-      revision: "8ed07bdd6390e64f126abb832bcab0da317f7f34"
+  desc "Command-line XML and HTML beautifier and content extractor (bukzor's patched version)"
+  homepage "https://github.com/bukzor/xq"
+  url "https://github.com/bukzor/xq.git",
+      revision: "78d26b68b6fb3cad860763dcecca911cf237330d"
+  version "1.2.1-bukzor1"
   license "MIT"
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_sonoma:   "73487c0cd3b97f0b0440b3e5d35d5ce4448bdd731a9e5b23653e4459257f9170"
-    sha256 cellar: :any_skip_relocation, arm64_ventura:  "2cbb07af6bd4a55df5a4c4ed1db217b81c75f5f07cd7c7968c43192c0e9baec8"
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "2cbb07af6bd4a55df5a4c4ed1db217b81c75f5f07cd7c7968c43192c0e9baec8"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "2cbb07af6bd4a55df5a4c4ed1db217b81c75f5f07cd7c7968c43192c0e9baec8"
-    sha256 cellar: :any_skip_relocation, sonoma:         "1bceec7a5eb2131944672afd758a725b40630546b1e36ca2382c11aac9ce28a4"
-    sha256 cellar: :any_skip_relocation, ventura:        "b60dfc79a740dfc4acbed5b2cb931061bee6d9c1286f9967f640a2ee0a1cb78f"
-    sha256 cellar: :any_skip_relocation, monterey:       "b60dfc79a740dfc4acbed5b2cb931061bee6d9c1286f9967f640a2ee0a1cb78f"
-    sha256 cellar: :any_skip_relocation, big_sur:        "b60dfc79a740dfc4acbed5b2cb931061bee6d9c1286f9967f640a2ee0a1cb78f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "848e2e0e923439c1c1b8fb7fe527467aa1d492c062529ed3c52b1e7f4a45ee72"
-  end
+  head "https://github.com/bukzor/xq.git", branch: "all-fixes"
 
   depends_on "go" => :build
 
@@ -39,5 +29,13 @@ class Xq < Formula
 
     run_output = pipe_output(bin/"xq", "<root></root>")
     assert_match("<root/>", run_output)
+
+    # Test issue #160 fix: HTML entity escaping
+    html_output = pipe_output(bin/"xq --no-color", "<html>1 &amp; 2</html>")
+    assert_match "&amp;", html_output
+
+    # Test issue #160 fix: CDATA support
+    cdata_output = pipe_output(bin/"xq --no-color", "<root><![CDATA[test]]></root>")
+    assert_match "test", cdata_output
   end
 end
