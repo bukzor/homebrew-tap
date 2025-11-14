@@ -2,8 +2,8 @@ class Xq < Formula
   desc "Command-line XML and HTML beautifier and content extractor (bukzor's patched version)"
   homepage "https://github.com/bukzor/xq"
   url "https://github.com/bukzor/xq.git",
-      revision: "78d26b68b6fb3cad860763dcecca911cf237330d"
-  version "1.2.1-bukzor1"
+      revision: "33a4703d721b3120135fd1946130b02f20719545"
+  version "1.2.1-bukzor2"
   license "MIT"
 
   head "https://github.com/bukzor/xq.git", branch: "all-fixes"
