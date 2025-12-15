@@ -10,12 +10,21 @@ class GitCommitStaged < Formula
 
   depends_on "openssl@3"
   depends_on "pkg-config" => :build
+  # Use rustup instead of rust formula; Homebrew's rust bottles have glibc
+  # version mismatches on Linux that cause link failures.
   depends_on "rustup" => :build
 
   def install
-    ENV.prepend_path "PATH", Formula["rustup"].opt_bin
-    # Homebrew's fake $HOME breaks rustup's toolchain lookup; ~user reads from /etc/passwd
-    ENV["RUSTUP_HOME"] = File.expand_path("~#{ENV["USER"]}/.rustup")
+    require "open3"
+    rustup = Formula["rustup"].opt_bin/"rustup"
+
+    # HOME => nil bypasses Homebrew's fake HOME so rustup finds its toolchains
+    cargo_path, status = Open3.capture2({"HOME" => nil}, rustup.to_s, "which", "cargo")
+    cargo_path.chomp!
+
+    odie "rustup could not find cargo; run 'rustup default stable'" unless status.success?
+
+    ENV.prepend_path "PATH", File.dirname(cargo_path)
 
     cd "git-commit-staged" do
       system "cargo", "build", "--release"
