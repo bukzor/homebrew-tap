@@ -8,12 +8,18 @@ class GitCommitStaged < Formula
 
   head "https://github.com/bukzor/git-partial.prototyping.git", branch: "main"
 
-  depends_on "rust" => :build
+  depends_on "openssl@3"
+  depends_on "pkg-config" => :build
+  depends_on "rustup" => :build
 
   def install
+    ENV.prepend_path "PATH", Formula["rustup"].opt_bin
+    # Homebrew's fake $HOME breaks rustup's toolchain lookup; ~user reads from /etc/passwd
+    ENV["RUSTUP_HOME"] = File.expand_path("~#{ENV["USER"]}/.rustup")
+
     cd "git-commit-staged" do
       system "cargo", "build", "--release"
-      bin.install "target/release/git-commit-staged"
+      bin.install "../target/release/git-commit-staged"
       man1.install "man/git-commit-staged.1"
     end
   end
