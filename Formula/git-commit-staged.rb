@@ -29,7 +29,9 @@ class GitCommitStaged < Formula
     cd "git-commit-staged" do
       system "cargo", "build", "--release"
       bin.install "../target/release/git-commit-staged"
+      bin.install "../target/release/git-commit-files"
       man1.install "man/git-commit-staged.1"
+      man1.install "man/git-commit-files.1"
     end
   end
 
